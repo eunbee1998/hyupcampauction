@@ -18,8 +18,8 @@ const cards = Array.from({ length: 20 }, (_, i) => {
   const num = (i + 1).toString().padStart(2, '0');
   const pos = ['TOP', 'JUG', 'MID', 'ADC', 'SUP'][i % 5];
   return {
-    filename: `${num}_선수${i + 1}_${pos}.png`,
-    name: `선수${i + 1}`,
+    filename: num + "_선수" + (i + 1) + "_" + pos + ".png",
+    name: "선수" + (i + 1),
     position: pos
   };
 });
@@ -57,7 +57,7 @@ function Auction({ username }) {
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      alert(`⏱️ 타이머 종료! 낙찰자: ${highestBid.name} / ${highestBid.amount} 포인트`);
+      alert("⏱️ 타이머 종료! 낙찰자: " + highestBid.name + " / " + highestBid.amount + " 포인트");
     }
     const timer = setInterval(() => {
       setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
@@ -95,7 +95,7 @@ function Auction({ username }) {
     <div style={{ textAlign: 'center', marginTop: '30px' }}>
       <h2>현재 카드: {currentCard.name} ({currentCard.position})</h2>
       <img
-        src={\`\${process.env.PUBLIC_URL}/images/\${currentCard.filename}\`}
+        src={process.env.PUBLIC_URL + "/images/" + currentCard.filename}
         alt={currentCard.name}
         style={{ width: '250px', height: '360px', borderRadius: '10px', marginBottom: '20px' }}
       />
