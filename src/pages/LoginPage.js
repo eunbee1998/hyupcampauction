@@ -1,27 +1,27 @@
-import React, { useState } from "react";
 
-const ADMIN_CODE = "admin123";
+import React from "react";
+
+const USERS = [
+  { name: "팀장1", isAdmin: false },
+  { name: "팀장2", isAdmin: false },
+  { name: "팀장3", isAdmin: false },
+  { name: "팀장4", isAdmin: false },
+  { name: "관리자", isAdmin: true }
+];
 
 function LoginPage({ onLogin }) {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const isAdmin = password === ADMIN_CODE;
-    onLogin(name, isAdmin);
-  };
-
   return (
     <div style={{ textAlign: "center", marginTop: "25vh" }}>
-      <h2>로그인</h2>
-      <form onSubmit={handleSubmit}>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름 입력" required />
-        <br />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="비밀번호 입력" />
-        <br />
-        <button type="submit">입장</button>
-      </form>
+      <h2>사용자 선택</h2>
+      {USERS.map((user, idx) => (
+        <button
+          key={idx}
+          onClick={() => onLogin(user.name, user.isAdmin)}
+          style={{ margin: 10, padding: 10 }}
+        >
+          {user.name}
+        </button>
+      ))}
     </div>
   );
 }
