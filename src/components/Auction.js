@@ -29,22 +29,24 @@ function Auction({ username }) {
   const [bid, setBid] = useState('');
   const [highestBid, setHighestBid] = useState({ name: '', amount: 0 });
   const [bidHistory, setBidHistory] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const isAdmin = username === "관리자";
 
   const currentCard = cards[cardIndex];
-  const isAdmin = username === "관리자";
 
   useEffect(() => {
     const unsubCurrent = onSnapshot(doc(db, "auction", "currentBid"), (docSnap) => {
       if (docSnap.exists()) setHighestBid(docSnap.data());
     });
 
-    const unsubTimer = onSnapshot(doc(db, "auction", "timer"), (docSnap) => {
+    const unsubTimer = onSnapshot(doc(db, "auction", "state"), (docSnap) => {
       if (docSnap.exists()) {
-        setTimeLeft(docSnap.data().secondsLeft);
-        setTimerActive(docSnap.data().secondsLeft > 0);
+        const data = docSnap.data();
+        setCardIndex(data.cardIndex || 0);
+        setTimeLeft(data.secondsLeft || 0);
+        setTimerActive(data.secondsLeft > 0);
       }
     });
 
@@ -77,13 +79,7 @@ function Auction({ username }) {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [timerActive, timeLeft]);
-
-  const startTimer = async () => {
-    if (isAdmin) {
-      await setDoc(doc(db, "auction", "timer"), { secondsLeft: 15 });
-    }
-  };
+  }, [timerActive]);
 
   const submitBid = async () => {
     const amount = parseInt(bid);
@@ -94,35 +90,40 @@ function Auction({ username }) {
         amount,
         timestamp: serverTimestamp()
       });
+      await setDoc(doc(db, "auction", "state"), { cardIndex, secondsLeft: 15 });
     } else {
       alert("현재 입찰가보다 높은 금액을 입력하세요.");
     }
     setBid('');
   };
 
-  const nextCard = () => {
+  const startTimer = async () => {
+    if (isAdmin) {
+      await setDoc(doc(db, "auction", "state"), { cardIndex, secondsLeft: 15 });
+    }
+  };
+
+  const nextCard = async () => {
     if (!isAdmin) return;
-    if (cardIndex < cards.length - 1) {
-      setCardIndex(prev => prev + 1);
-      setHighestBid({ name: '', amount: 0 });
-      setTimeLeft(0);
+    const next = cardIndex + 1;
+    if (next < cards.length) {
+      await setDoc(doc(db, "auction", "state"), { cardIndex: next, secondsLeft: 0 });
+      await setDoc(doc(db, "auction", "currentBid"), { name: "", amount: 0 });
     } else {
       alert("📦 모든 카드 경매가 완료되었습니다.");
     }
   };
 
   const resetAuction = async () => {
-    if (!window.confirm("정말로 경매를 초기화하시겠습니까? 모든 입찰 내역이 삭제됩니다.")) return;
+    if (!window.confirm("정말로 경매를 초기화하시겠습니까?")) return;
     await setDoc(doc(db, "auction", "currentBid"), { name: "", amount: 0 });
-    await setDoc(doc(db, "auction", "timer"), { secondsLeft: 0 });
+    await setDoc(doc(db, "auction", "state"), { cardIndex: 0, secondsLeft: 0 });
     const historyRef = collection(db, "auction", "history", "bids");
     const bids = await getDocs(historyRef);
     for (let bid of bids.docs) {
       await deleteDoc(bid.ref);
     }
-    setCardIndex(0);
-    setBid('');
-    alert("🧼 경매가 초기화되었습니다.");
+    alert("🧼 경매 초기화 완료!");
   };
 
   return (
@@ -139,9 +140,9 @@ function Auction({ username }) {
       <button onClick={submitBid}>입찰</button>
       {isAdmin && (
         <div>
-          <button onClick={startTimer} style={{ margin: '10px' }}>⏱ 타이머 시작</button>
-          <button onClick={nextCard} style={{ margin: '10px' }}>다음 카드 ▶</button>
-          <button onClick={resetAuction} style={{ backgroundColor: 'red', color: 'white', marginTop: '10px' }}>🧼 경매 초기화</button>
+          <button onClick={startTimer}>⏱ 타이머 시작</button>
+          <button onClick={nextCard}>다음 카드 ▶</button>
+          <button onClick={resetAuction} style={{ backgroundColor: 'red', color: 'white' }}>🧼 경매 초기화</button>
         </div>
       )}
       <h3 style={{ marginTop: '40px' }}>🧾 최근 입찰 내역</h3>
