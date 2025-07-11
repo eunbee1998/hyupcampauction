@@ -47,7 +47,7 @@ function Auction({ username }) {
         const data = docSnap.data();
         setCardIndex(data.cardIndex || 0);
         setTimeLeft(data.secondsLeft || 0);
-        setTimerActive(data.secondsLeft > 0);
+        if (data.secondsLeft > 0) setTimerActive(true);
       }
     });
 
@@ -101,6 +101,7 @@ function Auction({ username }) {
         cardIndex: currentState.cardIndex ?? 0
       };
       await setDoc(stateRef, updatedState);
+      setTimerActive(true);  // ✅ 타이머 강제 작동 시작
     } else {
       alert("현재 입찰가보다 높은 금액을 입력하세요.");
     }
@@ -110,6 +111,7 @@ function Auction({ username }) {
   const startTimer = async () => {
     if (isAdmin) {
       await setDoc(doc(db, "auction", "state"), { cardIndex, secondsLeft: 15 });
+      setTimerActive(true);
     }
   };
 
