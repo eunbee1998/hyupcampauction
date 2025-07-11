@@ -12,7 +12,8 @@ import {
   orderBy,
   limit,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  getDoc
 } from 'firebase/firestore';
 
 const cards = Array.from({ length: 20 }, (_, i) => {
@@ -90,7 +91,16 @@ function Auction({ username }) {
         amount,
         timestamp: serverTimestamp()
       });
-      await setDoc(doc(db, "auction", "state"), { cardIndex, secondsLeft: 15 });
+
+      const stateRef = doc(db, "auction", "state");
+      const stateSnap = await getDoc(stateRef);
+      const currentState = stateSnap.exists() ? stateSnap.data() : {};
+      const updatedState = {
+        ...currentState,
+        secondsLeft: 15,
+        cardIndex: currentState.cardIndex ?? 0
+      };
+      await setDoc(stateRef, updatedState);
     } else {
       alert("현재 입찰가보다 높은 금액을 입력하세요.");
     }
