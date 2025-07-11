@@ -5,11 +5,26 @@ import TeamBoard from './components/TeamBoard';
 import { parseCardFileName } from './utils/auctionLogic';
 
 const dummyCards = [
-  "01_김철수_TOP.png",
-  "02_이영희_JUG.png",
-  "03_박민수_MID.png",
-  "04_최지우_ADC.png",
-  "05_조민호_SUP.png"
+  "01_선수1_TOP.png",
+  "02_선수2_JUG.png",
+  "03_선수3_MID.png",
+  "04_선수4_ADC.png",
+  "05_선수5_SUP.png",
+  "06_선수6_TOP.png",
+  "07_선수7_JUG.png",
+  "08_선수8_MID.png",
+  "09_선수9_ADC.png",
+  "10_선수10_SUP.png",
+  "11_선수11_TOP.png",
+  "12_선수12_JUG.png",
+  "13_선수13_MID.png",
+  "14_선수14_ADC.png",
+  "15_선수15_SUP.png",
+  "16_선수16_TOP.png",
+  "17_선수17_JUG.png",
+  "18_선수18_MID.png",
+  "19_선수19_ADC.png",
+  "20_선수20_SUP.png"
 ];
 
 function App() {
