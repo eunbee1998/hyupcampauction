@@ -8,14 +8,26 @@ import {
   serverTimestamp, query, orderBy, limit
 } from 'firebase/firestore';
 
+const cards = Array.from({ length: 20 }, (_, i) => {
+  const num = (i + 1).toString().padStart(2, '0');
+  const pos = ['TOP', 'JUG', 'MID', 'ADC', 'SUP'][i % 5];
+  return {
+    filename: `${num}_선수${i + 1}_${pos}.png`,
+    name: `선수${i + 1}`,
+    position: pos
+  };
+});
+
 function LayoutAuction() {
   const [bidAmount, setBidAmount] = useState(0);
   const [highestBid, setHighestBid] = useState({ name: '', amount: 0 });
   const [timeLeft, setTimeLeft] = useState(0);
   const [lastTick, setLastTick] = useState(Date.now());
   const [bidHistory, setBidHistory] = useState([]);
+  const [cardIndex, setCardIndex] = useState(0);
 
-  const username = "팀장1"; // 추후 로그인 값으로 교체 가능
+  const currentCard = cards[cardIndex];
+  const username = "팀장1";
 
   useEffect(() => {
     const unsubBid = onSnapshot(doc(db, "auction", "currentBid"), (snap) => {
@@ -26,6 +38,7 @@ function LayoutAuction() {
       if (snap.exists()) {
         const data = snap.data();
         setTimeLeft(data.secondsLeft || 0);
+        setCardIndex(data.cardIndex || 0);
         setLastTick(data.updatedAt || Date.now());
       }
     });
@@ -65,11 +78,26 @@ function LayoutAuction() {
       });
       await setDoc(doc(db, "auction", "state"), {
         secondsLeft: 15,
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        cardIndex
       });
       alert("✅ 입찰 완료!");
     } else {
       alert("❌ 현재 최고 입찰가보다 높아야 합니다.");
+    }
+  };
+
+  const nextCard = async () => {
+    const next = cardIndex + 1;
+    if (next < cards.length) {
+      await setDoc(doc(db, "auction", "state"), {
+        cardIndex: next,
+        secondsLeft: 0,
+        updatedAt: Date.now()
+      });
+      await setDoc(doc(db, "auction", "currentBid"), { name: "", amount: 0 });
+    } else {
+      alert("📦 모든 카드 경매가 완료되었습니다.");
     }
   };
 
@@ -84,6 +112,12 @@ function LayoutAuction() {
       <div className="main">
         <h1>Hyupcamp 자낳대 경매</h1>
         <div className="timer">TIME COUNT: {timeLeft}</div>
+        <img
+          src={process.env.PUBLIC_URL + "/images/" + currentCard.filename}
+          alt={currentCard.name}
+          style={{ width: '220px', height: '300px', borderRadius: '10px', marginBottom: '10px' }}
+        />
+        <div>{currentCard.name} - {currentCard.position}</div>
         <div className="center-panel">
           <div>입찰 금액</div>
           <input type="number" value={bidAmount} readOnly />
@@ -93,6 +127,7 @@ function LayoutAuction() {
             <button onClick={() => handleBidChange(50)}>+50</button>
             <button onClick={() => handleBidChange(100)}>+100</button>
             <button className="submit" onClick={submitBid}>제출</button>
+            <button onClick={nextCard}>다음 카드 ▶</button>
           </div>
           <h3 style={{ marginTop: '30px' }}>🧾 최근 입찰</h3>
           <ul>
