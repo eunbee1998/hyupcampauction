@@ -5,7 +5,8 @@ const USERS = [
   { name: '팀장1', password: 'pass1' },
   { name: '팀장2', password: 'pass2' },
   { name: '팀장3', password: 'pass3' },
-  { name: '팀장4', password: 'pass4' }
+  { name: '팀장4', password: 'pass4' },
+  { name: '관리자', password: 'adminpass' }
 ];
 
 function Login({ onLogin }) {
