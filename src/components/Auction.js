@@ -32,7 +32,7 @@ function Auction({ username }) {
   const [bidHistory, setBidHistory] = useState([]);
   const [cardIndex, setCardIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [timerActive, setTimerActive] = useState(false);
+  const [lastTick, setLastTick] = useState(Date.now());
   const isAdmin = username === "관리자";
 
   const currentCard = cards[cardIndex];
@@ -47,7 +47,7 @@ function Auction({ username }) {
         const data = docSnap.data();
         setCardIndex(data.cardIndex || 0);
         setTimeLeft(data.secondsLeft || 0);
-        if (data.secondsLeft > 0) setTimerActive(true);
+        setLastTick(Date.now());
       }
     });
 
@@ -65,22 +65,18 @@ function Auction({ username }) {
   }, []);
 
   useEffect(() => {
-    let timer;
-    if (timerActive && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft(prev => {
-          const updated = prev - 1;
-          if (updated <= 0) {
-            clearInterval(timer);
-            setTimerActive(false);
-            alert("⏱️ 타이머 종료! 낙찰자: " + highestBid.name + " / " + highestBid.amount + " 포인트");
-          }
-          return updated;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [timerActive]);
+    if (timeLeft <= 0) return;
+    const interval = setInterval(async () => {
+      const elapsed = Math.floor((Date.now() - lastTick) / 1000);
+      const newTime = Math.max(15 - elapsed, 0);
+      setTimeLeft(newTime);
+      if (newTime === 0) {
+        clearInterval(interval);
+        alert("⏱️ 타이머 종료! 낙찰자: " + highestBid.name + " / " + highestBid.amount + " 포인트");
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastTick]);
 
   const submitBid = async () => {
     const amount = parseInt(bid);
@@ -91,17 +87,14 @@ function Auction({ username }) {
         amount,
         timestamp: serverTimestamp()
       });
-
       const stateRef = doc(db, "auction", "state");
       const stateSnap = await getDoc(stateRef);
       const currentState = stateSnap.exists() ? stateSnap.data() : {};
-      const updatedState = {
+      await setDoc(stateRef, {
         ...currentState,
         secondsLeft: 15,
         cardIndex: currentState.cardIndex ?? 0
-      };
-      await setDoc(stateRef, updatedState);
-      setTimerActive(true);  // ✅ 타이머 강제 작동 시작
+      });
     } else {
       alert("현재 입찰가보다 높은 금액을 입력하세요.");
     }
@@ -111,7 +104,6 @@ function Auction({ username }) {
   const startTimer = async () => {
     if (isAdmin) {
       await setDoc(doc(db, "auction", "state"), { cardIndex, secondsLeft: 15 });
-      setTimerActive(true);
     }
   };
 
