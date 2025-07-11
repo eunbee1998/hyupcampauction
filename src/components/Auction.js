@@ -66,13 +66,27 @@ function Auction({ username }) {
 
   useEffect(() => {
     if (timeLeft <= 0) return;
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       const elapsed = Math.floor((Date.now() - lastUpdated) / 1000);
       const newTime = Math.max(15 - elapsed, 0);
       setTimeLeft(newTime);
       if (newTime === 0) {
         clearInterval(interval);
         alert("⏱️ 타이머 종료! 낙찰자: " + highestBid.name + " / " + highestBid.amount + " 포인트");
+
+        // ✅ 자동 팀 배정 Firestore 저장
+        const assignmentRef = collection(db, "auction", "teams", "assignments");
+        const player = currentCard.name;
+        const position = currentCard.position;
+        const team = highestBid.name;
+        if (team) {
+          await addDoc(assignmentRef, {
+            team,
+            position,
+            player,
+            assignedAt: serverTimestamp()
+          });
+        }
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -146,6 +160,9 @@ function Auction({ username }) {
 
   return (
     <div style={{ textAlign: 'center', marginTop: '30px' }}>
+      <div style={{ position: 'absolute', top: '10px', left: '10px', fontWeight: 'bold' }}>
+        🙋‍♂️ 현재 사용자: {username}
+      </div>
       <h2>현재 카드: {currentCard.name} ({currentCard.position})</h2>
       <img
         src={process.env.PUBLIC_URL + "/images/" + currentCard.filename}
