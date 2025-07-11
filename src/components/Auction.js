@@ -5,12 +5,13 @@ import {
   doc,
   onSnapshot,
   setDoc,
+  deleteDoc,
   collection,
-  addDoc,
+  getDocs,
   query,
   orderBy,
   limit,
-  onSnapshot as onCollSnapshot,
+  addDoc,
   serverTimestamp
 } from 'firebase/firestore';
 
@@ -32,6 +33,7 @@ function Auction({ username }) {
   const [cardIndex, setCardIndex] = useState(0);
 
   const currentCard = cards[cardIndex];
+  const isAdmin = username === "관리자";
 
   useEffect(() => {
     const unsubCurrent = onSnapshot(doc(db, "auction", "currentBid"), (docSnap) => {
@@ -43,7 +45,7 @@ function Auction({ username }) {
     });
 
     const q = query(collection(db, "auction", "history", "bids"), orderBy("timestamp", "desc"), limit(5));
-    const unsubHistory = onCollSnapshot(q, (snapshot) => {
+    const unsubHistory = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => doc.data());
       setBidHistory(data);
     });
@@ -91,6 +93,20 @@ function Auction({ username }) {
     }
   };
 
+  const resetAuction = async () => {
+    if (!window.confirm("정말로 경매를 초기화하시겠습니까? 모든 입찰 내역이 삭제됩니다.")) return;
+    await setDoc(doc(db, "auction", "currentBid"), { name: "", amount: 0 });
+    await setDoc(doc(db, "auction", "timer"), { secondsLeft: 15 });
+    const historyRef = collection(db, "auction", "history", "bids");
+    const bids = await getDocs(historyRef);
+    for (let bid of bids.docs) {
+      await deleteDoc(bid.ref);
+    }
+    setCardIndex(0);
+    setBid('');
+    alert("🧼 경매가 초기화되었습니다.");
+  };
+
   return (
     <div style={{ textAlign: 'center', marginTop: '30px' }}>
       <h2>현재 카드: {currentCard.name} ({currentCard.position})</h2>
@@ -104,6 +120,11 @@ function Auction({ username }) {
       <input value={bid} onChange={e => setBid(e.target.value)} placeholder="입찰 금액" type="number" />
       <button onClick={submitBid}>입찰</button>
       <button onClick={nextCard} style={{ marginLeft: '20px' }}>다음 카드 ▶</button>
+      {isAdmin && (
+        <div style={{ marginTop: '20px' }}>
+          <button onClick={resetAuction} style={{ backgroundColor: 'red', color: 'white' }}>🧼 경매 초기화</button>
+        </div>
+      )}
       <h3 style={{ marginTop: '40px' }}>🧾 최근 입찰 내역</h3>
       <ul>
         {bidHistory.map((item, index) => (
