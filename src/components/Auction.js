@@ -32,7 +32,7 @@ function Auction({ username }) {
   const [bidHistory, setBidHistory] = useState([]);
   const [cardIndex, setCardIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [lastTick, setLastTick] = useState(Date.now());
+  const [lastUpdated, setLastUpdated] = useState(Date.now());
   const isAdmin = username === "관리자";
 
   const currentCard = cards[cardIndex];
@@ -47,7 +47,7 @@ function Auction({ username }) {
         const data = docSnap.data();
         setCardIndex(data.cardIndex || 0);
         setTimeLeft(data.secondsLeft || 0);
-        setLastTick(Date.now());
+        setLastUpdated(data.updatedAt || Date.now());
       }
     });
 
@@ -66,8 +66,8 @@ function Auction({ username }) {
 
   useEffect(() => {
     if (timeLeft <= 0) return;
-    const interval = setInterval(async () => {
-      const elapsed = Math.floor((Date.now() - lastTick) / 1000);
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - lastUpdated) / 1000);
       const newTime = Math.max(15 - elapsed, 0);
       setTimeLeft(newTime);
       if (newTime === 0) {
@@ -76,7 +76,7 @@ function Auction({ username }) {
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [lastTick]);
+  }, [lastUpdated]);
 
   const submitBid = async () => {
     const amount = parseInt(bid);
@@ -87,12 +87,14 @@ function Auction({ username }) {
         amount,
         timestamp: serverTimestamp()
       });
+
       const stateRef = doc(db, "auction", "state");
       const stateSnap = await getDoc(stateRef);
       const currentState = stateSnap.exists() ? stateSnap.data() : {};
       await setDoc(stateRef, {
         ...currentState,
         secondsLeft: 15,
+        updatedAt: Date.now(),
         cardIndex: currentState.cardIndex ?? 0
       });
     } else {
@@ -103,7 +105,11 @@ function Auction({ username }) {
 
   const startTimer = async () => {
     if (isAdmin) {
-      await setDoc(doc(db, "auction", "state"), { cardIndex, secondsLeft: 15 });
+      await setDoc(doc(db, "auction", "state"), {
+        cardIndex,
+        secondsLeft: 15,
+        updatedAt: Date.now()
+      });
     }
   };
 
@@ -111,7 +117,11 @@ function Auction({ username }) {
     if (!isAdmin) return;
     const next = cardIndex + 1;
     if (next < cards.length) {
-      await setDoc(doc(db, "auction", "state"), { cardIndex: next, secondsLeft: 0 });
+      await setDoc(doc(db, "auction", "state"), {
+        cardIndex: next,
+        secondsLeft: 0,
+        updatedAt: Date.now()
+      });
       await setDoc(doc(db, "auction", "currentBid"), { name: "", amount: 0 });
     } else {
       alert("📦 모든 카드 경매가 완료되었습니다.");
@@ -121,7 +131,11 @@ function Auction({ username }) {
   const resetAuction = async () => {
     if (!window.confirm("정말로 경매를 초기화하시겠습니까?")) return;
     await setDoc(doc(db, "auction", "currentBid"), { name: "", amount: 0 });
-    await setDoc(doc(db, "auction", "state"), { cardIndex: 0, secondsLeft: 0 });
+    await setDoc(doc(db, "auction", "state"), {
+      cardIndex: 0,
+      secondsLeft: 0,
+      updatedAt: Date.now()
+    });
     const historyRef = collection(db, "auction", "history", "bids");
     const bids = await getDocs(historyRef);
     for (let bid of bids.docs) {
