@@ -18,10 +18,15 @@ function Auction({ username }) {
   const [bid, setBid] = useState('');
   const [highestBid, setHighestBid] = useState({ name: '', amount: 0 });
   const [bidHistory, setBidHistory] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(15);
 
   useEffect(() => {
     const unsubCurrent = onSnapshot(doc(db, "auction", "currentBid"), (docSnap) => {
       if (docSnap.exists()) setHighestBid(docSnap.data());
+    });
+
+    const unsubTimer = onSnapshot(doc(db, "auction", "timer"), (docSnap) => {
+      if (docSnap.exists()) setTimeLeft(docSnap.data().secondsLeft);
     });
 
     const q = query(collection(db, "auction", "history", "bids"), orderBy("timestamp", "desc"), limit(5));
@@ -32,9 +37,20 @@ function Auction({ username }) {
 
     return () => {
       unsubCurrent();
+      unsubTimer();
       unsubHistory();
     };
   }, []);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      alert(`⏱️ 타이머 종료! 낙찰자: ${highestBid.name} / ${highestBid.amount} 포인트`);
+    }
+    const timer = setInterval(() => {
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [highestBid]);
 
   const submitBid = async () => {
     const amount = parseInt(bid);
@@ -45,6 +61,7 @@ function Auction({ username }) {
         amount,
         timestamp: serverTimestamp()
       });
+      await setDoc(doc(db, "auction", "timer"), { secondsLeft: 15 });
     } else {
       alert("현재 입찰가보다 높은 금액을 입력하세요.");
     }
@@ -54,6 +71,7 @@ function Auction({ username }) {
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
       <h2>현재 최고 입찰자: {highestBid.name} / 금액: {highestBid.amount}</h2>
+      <h3>⏱️ 남은 시간: {timeLeft}초</h3>
       <input value={bid} onChange={e => setBid(e.target.value)} placeholder="입찰 금액" type="number" />
       <button onClick={submitBid}>입찰</button>
       <h3 style={{ marginTop: '40px' }}>🧾 최근 입찰 내역</h3>
