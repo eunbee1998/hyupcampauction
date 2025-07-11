@@ -1,11 +1,15 @@
-
-import React, { useState } from 'react';
-import Login from './components/Login';
-import Auction from './components/Auction';
+import React, { useState } from "react";
+import AuctionPage from "./pages/AuctionPage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   const [user, setUser] = useState(null);
-  return user ? <Auction username={user} /> : <Login onLogin={setUser} />;
+
+  return user ? (
+    <AuctionPage user={user} />
+  ) : (
+    <LoginPage onLogin={(name) => setUser(name)} />
+  );
 }
 
 export default App;
