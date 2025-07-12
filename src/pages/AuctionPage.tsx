@@ -121,11 +121,6 @@ const AuctionPage = ({ username }: { username: string }) => {
 
     startTimer();
 
-    return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      {/* 왼쪽 팀 현황판 */}
-      <div style={{ width: "20%", borderRight: "1px solid #ccc", overflowY: "auto", background: "#f4f4f4" }}>
-        <TeamBoard />
       </div>
 
       {/* 중앙 메인 경매 영역 */}
@@ -136,11 +131,6 @@ const AuctionPage = ({ username }: { username: string }) => {
     };
   }, [highestBid]);
 
-  return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      {/* 왼쪽 팀 현황판 */}
-      <div style={{ width: "20%", borderRight: "1px solid #ccc", overflowY: "auto", background: "#f4f4f4" }}>
-        <TeamBoard />
       </div>
 
       {/* 중앙 메인 경매 영역 */}
