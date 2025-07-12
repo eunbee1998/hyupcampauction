@@ -125,10 +125,6 @@ const AuctionPage = ({ username }: { username: string }) => {
 
       {/* 중앙 메인 경매 영역 */}
       <div style={{ width: "60%", padding: "2rem", textAlign: "center" }}>
-) => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      unsubscribe();
-    };
   }, [highestBid]);
 
       </div>
