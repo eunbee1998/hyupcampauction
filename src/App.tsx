@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import LoginPage from "./pages/LoginPage";
+import AuctionPage from "./pages/AuctionPage";
 
 function App() {
-  return <LoginPage />;
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  return loggedIn ? <AuctionPage /> : <LoginPage onLogin={() => setLoggedIn(true)} />;
 }
 
 export default App;

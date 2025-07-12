@@ -1,6 +1,6 @@
 import React from "react";
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }: { onLogin: () => void }) => {
   return (
     <div style={{ padding: "2rem", textAlign: "center" }}>
       <h1>LOL 팀 경매 로그인</h1>
@@ -12,7 +12,9 @@ const LoginPage = () => {
         <option>관리자</option>
       </select>
       <br />
-      <button style={{ marginTop: "1rem" }}>로그인</button>
+      <button style={{ marginTop: "1rem" }} onClick={onLogin}>
+        로그인
+      </button>
     </div>
   );
 };
