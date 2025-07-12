@@ -1,1 +1,1 @@
-이 프로젝트는 4명의 팀장이 동시에 입찰할 수 있는 경매 구조를 포함합니다.
+Hyupcamp Auction with 20 Sample Card Images
