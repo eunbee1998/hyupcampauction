@@ -10,9 +10,9 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 
-const AuctionPage = () => {
+const AuctionPage = ({ username }: { username: string }) => {
   const [timeLeft, setTimeLeft] = useState(15);
-  const [bidAmount, setBidAmount] = useState("");
+  const [bidAmount, setBidAmount] = useState(0);
   const [highestBid, setHighestBid] = useState<number | null>(null);
   const [recentBids, setRecentBids] = useState<any[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -31,15 +31,17 @@ const AuctionPage = () => {
     }, 1000);
   };
 
+  const changeBidAmount = (delta: number) => {
+    setBidAmount((prev) => Math.max(0, prev + delta));
+  };
+
   const handleBid = async () => {
-    const bid = parseInt(bidAmount);
-    if (!isNaN(bid) && (highestBid === null || bid > highestBid)) {
+    if (bidAmount > 0 && (highestBid === null || bidAmount > highestBid)) {
       await addDoc(collection(db, "auction", "bids", "entries"), {
-        bidder: "팀장1", // 실제 로그인 사용자명으로 대체 가능
-        amount: bid,
+        bidder: username,
+        amount: bidAmount,
         timestamp: serverTimestamp()
       });
-      setBidAmount("");
     }
   };
 
@@ -57,7 +59,7 @@ const AuctionPage = () => {
         const top = Math.max(...bids.map((b: any) => b.amount));
         if (top !== highestBid) {
           setHighestBid(top);
-          startTimer(); // 실시간으로 갱신될 때 타이머 초기화
+          startTimer();
         }
       }
     });
@@ -72,19 +74,21 @@ const AuctionPage = () => {
 
   return (
     <div style={{ padding: "2rem", textAlign: "center" }}>
-      <h1>경매 페이지 (실시간)</h1>
+      <h1>{username} 경매 페이지</h1>
       <h2>남은 시간: {timeLeft}초</h2>
       <h2>현재 최고 입찰가: {highestBid ?? "없음"}</h2>
-      <input
-        type="number"
-        value={bidAmount}
-        onChange={(e) => setBidAmount(e.target.value)}
-        placeholder="입찰 금액 입력"
-        style={{ padding: "0.5rem", fontSize: "1rem" }}
-      />
+      <h3>입찰 금액: {bidAmount}P</h3>
+      <div style={{ marginBottom: "1rem" }}>
+        <button onClick={() => changeBidAmount(-100)}>-100</button>
+        <button onClick={() => changeBidAmount(-50)} style={{ margin: "0 10px" }}>-50</button>
+        <button onClick={() => changeBidAmount(-10)}>-10</button>
+        <button onClick={() => changeBidAmount(10)} style={{ marginLeft: "10px" }}>+10</button>
+        <button onClick={() => changeBidAmount(50)} style={{ margin: "0 10px" }}>+50</button>
+        <button onClick={() => changeBidAmount(100)}>+100</button>
+      </div>
       <button
         onClick={handleBid}
-        style={{ marginLeft: "1rem", padding: "0.5rem 1rem", fontSize: "1rem" }}
+        style={{ padding: "0.5rem 1rem", fontSize: "1rem" }}
       >
         입찰
       </button>

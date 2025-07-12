@@ -3,9 +3,13 @@ import LoginPage from "./pages/LoginPage";
 import AuctionPage from "./pages/AuctionPage";
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
 
-  return loggedIn ? <AuctionPage /> : <LoginPage onLogin={() => setLoggedIn(true)} />;
+  return loggedInUser ? (
+    <AuctionPage username={loggedInUser} />
+  ) : (
+    <LoginPage onLogin={(username) => setLoggedInUser(username)} />
+  );
 }
 
 export default App;
