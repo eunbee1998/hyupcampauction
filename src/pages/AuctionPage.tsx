@@ -9,6 +9,8 @@ import {
   limit,
   serverTimestamp
 } from "firebase/firestore";
+import PlayerCard from "../components/PlayerCard";
+import { players } from "../components/players";
 
 const AuctionPage = ({ username }: { username: string }) => {
   const [timeLeft, setTimeLeft] = useState(15);
@@ -17,9 +19,13 @@ const AuctionPage = ({ username }: { username: string }) => {
   const [topBidder, setTopBidder] = useState<string | null>(null);
   const [recentBids, setRecentBids] = useState<any[]>([]);
   const [auctionEnded, setAuctionEnded] = useState(false);
+  const [playerIndex, setPlayerIndex] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const currentPlayer = players[playerIndex];
   const disableBid = username === topBidder || auctionEnded;
+
+  const isAdmin = username === "관리자";
 
   const startTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -46,24 +52,39 @@ const AuctionPage = ({ username }: { username: string }) => {
       await addDoc(collection(db, "auction", "bids", "entries"), {
         bidder: username,
         amount: bidAmount,
+        playerId: currentPlayer.id,
         timestamp: serverTimestamp()
       });
     }
   };
 
-  // 낙찰 처리
+  const goToNextPlayer = () => {
+    if (!isAdmin) return;
+    if (playerIndex < players.length - 1) {
+      setPlayerIndex((prev) => prev + 1);
+      setHighestBid(null);
+      setTopBidder(null);
+      setBidAmount(0);
+      setRecentBids([]);
+      setAuctionEnded(false);
+      startTimer();
+    } else {
+      alert("모든 선수 경매가 완료되었습니다.");
+    }
+  };
+
   useEffect(() => {
     if (timeLeft === 0 && !auctionEnded && topBidder && highestBid !== null) {
       setAuctionEnded(true);
       addDoc(collection(db, "auction", "results", "entries"), {
         winner: topBidder,
         amount: highestBid,
+        player: currentPlayer,
         timestamp: serverTimestamp()
       });
     }
   }, [timeLeft, auctionEnded, topBidder, highestBid]);
 
-  // 실시간 입찰 내역
   useEffect(() => {
     const q = query(
       collection(db, "auction", "bids", "entries"),
@@ -81,7 +102,7 @@ const AuctionPage = ({ username }: { username: string }) => {
         setHighestBid(top.amount);
         setTopBidder(top.bidder);
         if (top.amount !== highestBid) {
-          startTimer(); // 입찰 시 타이머 초기화
+          startTimer();
         }
       }
     });
@@ -97,10 +118,9 @@ const AuctionPage = ({ username }: { username: string }) => {
   return (
     <div style={{ padding: "2rem", textAlign: "center" }}>
       <h1>{username} 경매 페이지</h1>
+      <PlayerCard player={currentPlayer} />
       <h2>남은 시간: {timeLeft}초</h2>
-      <h2>
-        현재 최고 입찰가: {highestBid ?? "없음"} ({topBidder ?? "없음"})
-      </h2>
+      <h2>현재 최고 입찰가: {highestBid ?? "없음"} ({topBidder ?? "없음"})</h2>
       <h3>입찰 금액: {bidAmount}P</h3>
 
       {disableBid && (
@@ -127,6 +147,17 @@ const AuctionPage = ({ username }: { username: string }) => {
       >
         입찰
       </button>
+
+      {isAdmin && (
+        <div style={{ marginTop: "2rem" }}>
+          <button
+            onClick={goToNextPlayer}
+            style={{ padding: "0.5rem 1rem", backgroundColor: "#333", color: "#fff", fontWeight: "bold" }}
+          >
+            👉 다음 선수로 진행
+          </button>
+        </div>
+      )}
 
       <div style={{ marginTop: "2rem" }}>
         <h3>최근 입찰 내역</h3>

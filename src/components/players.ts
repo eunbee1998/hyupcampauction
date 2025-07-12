@@ -1,0 +1,22 @@
+export const players = [
+  { id: "p1", name: "Zeus", position: "Top", image: "/cards/Zeus.png" },
+  { id: "p2", name: "Canyon", position: "Jungle", image: "/cards/Canyon.png" },
+  { id: "p3", name: "Chovy", position: "Mid", image: "/cards/Chovy.png" },
+  { id: "p4", name: "Gumayusi", position: "ADC", image: "/cards/Gumayusi.png" },
+  { id: "p5", name: "Keria", position: "Support", image: "/cards/Keria.png" },
+  { id: "p6", name: "Doran", position: "Top", image: "/cards/Doran.png" },
+  { id: "p7", name: "Peanut", position: "Jungle", image: "/cards/Peanut.png" },
+  { id: "p8", name: "Faker", position: "Mid", image: "/cards/Faker.png" },
+  { id: "p9", name: "Ruler", position: "ADC", image: "/cards/Ruler.png" },
+  { id: "p10", name: "BeryL", position: "Support", image: "/cards/BeryL.png" },
+  { id: "p11", name: "Zeka", position: "Mid", image: "/cards/Zeka.png" },
+  { id: "p12", name: "Oner", position: "Jungle", image: "/cards/Oner.png" },
+  { id: "p13", name: "Deft", position: "ADC", image: "/cards/Deft.png" },
+  { id: "p14", name: "Lehends", position: "Support", image: "/cards/Lehends.png" },
+  { id: "p15", name: "Cuzz", position: "Jungle", image: "/cards/Cuzz.png" },
+  { id: "p16", name: "Kiin", position: "Top", image: "/cards/Kiin.png" },
+  { id: "p17", name: "BDD", position: "Mid", image: "/cards/BDD.png" },
+  { id: "p18", name: "Aiming", position: "ADC", image: "/cards/Aiming.png" },
+  { id: "p19", name: "Effort", position: "Support", image: "/cards/Effort.png" },
+  { id: "p20", name: "Morgan", position: "Top", image: "/cards/Morgan.png" }
+];
