@@ -125,11 +125,11 @@ const AuctionPage = ({ username }: { username: string }) => {
 
       {/* 중앙 메인 경매 영역 */}
       <div style={{ width: "60%", padding: "2rem", textAlign: "center" }}>
-  }, [highestBid]);
 
       </div>
 
       {/* 중앙 메인 경매 영역 */}
+  }, [highestBid]);
       <div style={{ width: "60%", padding: "2rem", textAlign: "center" }}>
 
     <div style={{ padding: "2rem", textAlign: "center" }}>
