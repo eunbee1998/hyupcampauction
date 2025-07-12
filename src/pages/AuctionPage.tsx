@@ -119,12 +119,10 @@ const AuctionPage = ({ username }: { username: string }) => {
     });
 
 
-      </div>
 
       {/* 중앙 메인 경매 영역 */}
       <div style={{ width: "60%", padding: "2rem", textAlign: "center" }}>
 
-      </div>
 
       {/* 중앙 메인 경매 영역 */}
   }, [highestBid]);
@@ -152,7 +150,6 @@ const AuctionPage = ({ username }: { username: string }) => {
         <button onClick={() => changeBidAmount(10)} style={{ marginLeft: "10px" }} disabled={disableBid}>+10</button>
         <button onClick={() => changeBidAmount(50)} style={{ margin: "0 10px" }} disabled={disableBid}>+50</button>
         <button onClick={() => changeBidAmount(100)} disabled={disableBid}>+100</button>
-      </div>
 
       <button
         onClick={handleBid}
@@ -170,7 +167,6 @@ const AuctionPage = ({ username }: { username: string }) => {
           >
             👉 다음 선수로 진행
           </button>
-        </div>
       )}
 
       <div style={{ marginTop: "2rem" }}>
@@ -182,8 +178,6 @@ const AuctionPage = ({ username }: { username: string }) => {
             </li>
           ))}
         </ul>
-      </div>
-    </div>
   );
 };
 
