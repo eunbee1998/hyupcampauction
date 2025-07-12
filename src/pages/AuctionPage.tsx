@@ -3,6 +3,9 @@ import { db } from "../firebase/firebaseConfig";
 import {
   addDoc,
   collection,
+  deleteDoc,
+  getDocs,
+  doc,
   onSnapshot,
   query,
   orderBy,
@@ -10,6 +13,8 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import PlayerCard from "../components/PlayerCard";
+import TeamBoard from "../components/TeamBoard";
+
 import { players } from "../components/players";
 
 const AuctionPage = ({ username }: { username: string }) => {
@@ -24,7 +29,6 @@ const AuctionPage = ({ username }: { username: string }) => {
 
   const currentPlayer = players[playerIndex];
   const disableBid = username === topBidder || auctionEnded;
-
   const isAdmin = username === "관리자";
 
   const startTimer = () => {
@@ -58,7 +62,14 @@ const AuctionPage = ({ username }: { username: string }) => {
     }
   };
 
-  const goToNextPlayer = () => {
+  const clearBidEntries = async () => {
+    const bidsRef = collection(db, "auction", "bids", "entries");
+    const snapshot = await getDocs(bidsRef);
+    const deletePromises = snapshot.docs.map((docSnap) => deleteDoc(doc(bidsRef, docSnap.id)));
+    await Promise.all(deletePromises);
+  };
+
+  const goToNextPlayer = async () => {
     if (!isAdmin) return;
     if (playerIndex < players.length - 1) {
       setPlayerIndex((prev) => prev + 1);
@@ -67,6 +78,7 @@ const AuctionPage = ({ username }: { username: string }) => {
       setBidAmount(0);
       setRecentBids([]);
       setAuctionEnded(false);
+      await clearBidEntries(); // 입찰 초기화 추가
       startTimer();
     } else {
       alert("모든 선수 경매가 완료되었습니다.");
@@ -109,13 +121,31 @@ const AuctionPage = ({ username }: { username: string }) => {
 
     startTimer();
 
-    return () => {
+    return (
+    <div style={{ display: "flex", height: "100vh" }}>
+      {/* 왼쪽 팀 현황판 */}
+      <div style={{ width: "20%", borderRight: "1px solid #ccc", overflowY: "auto", background: "#f4f4f4" }}>
+        <TeamBoard />
+      </div>
+
+      {/* 중앙 메인 경매 영역 */}
+      <div style={{ width: "60%", padding: "2rem", textAlign: "center" }}>
+) => {
       if (timerRef.current) clearInterval(timerRef.current);
       unsubscribe();
     };
   }, [highestBid]);
 
   return (
+    <div style={{ display: "flex", height: "100vh" }}>
+      {/* 왼쪽 팀 현황판 */}
+      <div style={{ width: "20%", borderRight: "1px solid #ccc", overflowY: "auto", background: "#f4f4f4" }}>
+        <TeamBoard />
+      </div>
+
+      {/* 중앙 메인 경매 영역 */}
+      <div style={{ width: "60%", padding: "2rem", textAlign: "center" }}>
+
     <div style={{ padding: "2rem", textAlign: "center" }}>
       <h1>{username} 경매 페이지</h1>
       <PlayerCard player={currentPlayer} />
@@ -172,5 +202,6 @@ const AuctionPage = ({ username }: { username: string }) => {
     </div>
   );
 };
+
 
 export default AuctionPage;
