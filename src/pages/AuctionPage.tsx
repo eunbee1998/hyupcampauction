@@ -79,13 +79,13 @@ const AuctionPage = ({ username }: { username: string }) => {
       setRecentBids([]);
       setAuctionEnded(false);
       await clearBidEntries(); // 입찰 초기화 추가
-      startTimer();
     } else {
       alert("모든 선수 경매가 완료되었습니다.");
     }
   };
 
   useEffect(() => {
+    startTimer();
     if (timeLeft === 0 && !auctionEnded && topBidder && highestBid !== null) {
       setAuctionEnded(true);
       addDoc(collection(db, "auction", "results", "entries"), {
@@ -114,12 +114,10 @@ const AuctionPage = ({ username }: { username: string }) => {
         setHighestBid(top.amount);
         setTopBidder(top.bidder);
         if (top.amount !== highestBid) {
-          startTimer();
         }
       }
     });
 
-    startTimer();
 
       </div>
 
