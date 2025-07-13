@@ -1,102 +1,102 @@
 [
   {
-    "name": "고길동",
+    "name": "선수1",
     "position": "탑",
-    "image": "/images/고길동.png"
+    "image": "/images/player01.png"
   },
   {
-    "name": "김철수",
+    "name": "선수2",
     "position": "정글",
-    "image": "/images/김철수.png"
+    "image": "/images/player02.png"
   },
   {
-    "name": "박영희",
+    "name": "선수3",
     "position": "미드",
-    "image": "/images/박영희.png"
+    "image": "/images/player03.png"
   },
   {
-    "name": "이몽룡",
+    "name": "선수4",
     "position": "원딜",
-    "image": "/images/이몽룡.png"
+    "image": "/images/player04.png"
   },
   {
-    "name": "성춘향",
+    "name": "선수5",
     "position": "서폿",
-    "image": "/images/성춘향.png"
+    "image": "/images/player05.png"
   },
   {
-    "name": "변학도",
+    "name": "선수6",
     "position": "탑",
-    "image": "/images/변학도.png"
+    "image": "/images/player06.png"
   },
   {
-    "name": "장보고",
+    "name": "선수7",
     "position": "정글",
-    "image": "/images/장보고.png"
+    "image": "/images/player07.png"
   },
   {
-    "name": "홍길동",
+    "name": "선수8",
     "position": "미드",
-    "image": "/images/홍길동.png"
+    "image": "/images/player08.png"
   },
   {
-    "name": "임꺽정",
+    "name": "선수9",
     "position": "원딜",
-    "image": "/images/임꺽정.png"
+    "image": "/images/player09.png"
   },
   {
-    "name": "이순신",
+    "name": "선수10",
     "position": "서폿",
-    "image": "/images/이순신.png"
+    "image": "/images/player10.png"
   },
   {
-    "name": "강감찬",
+    "name": "선수11",
     "position": "탑",
-    "image": "/images/강감찬.png"
+    "image": "/images/player11.png"
   },
   {
-    "name": "을지문덕",
+    "name": "선수12",
     "position": "정글",
-    "image": "/images/을지문덕.png"
+    "image": "/images/player12.png"
   },
   {
-    "name": "유관순",
+    "name": "선수13",
     "position": "미드",
-    "image": "/images/유관순.png"
+    "image": "/images/player13.png"
   },
   {
-    "name": "안중근",
+    "name": "선수14",
     "position": "원딜",
-    "image": "/images/안중근.png"
+    "image": "/images/player14.png"
   },
   {
-    "name": "윤봉길",
+    "name": "선수15",
     "position": "서폿",
-    "image": "/images/윤봉길.png"
+    "image": "/images/player15.png"
   },
   {
-    "name": "신사임당",
+    "name": "선수16",
     "position": "탑",
-    "image": "/images/신사임당.png"
+    "image": "/images/player16.png"
   },
   {
-    "name": "김유신",
+    "name": "선수17",
     "position": "정글",
-    "image": "/images/김유신.png"
+    "image": "/images/player17.png"
   },
   {
-    "name": "최영",
+    "name": "선수18",
     "position": "미드",
-    "image": "/images/최영.png"
+    "image": "/images/player18.png"
   },
   {
-    "name": "장영실",
+    "name": "선수19",
     "position": "원딜",
-    "image": "/images/장영실.png"
+    "image": "/images/player19.png"
   },
   {
-    "name": "정약용",
+    "name": "선수20",
     "position": "서폿",
-    "image": "/images/정약용.png"
+    "image": "/images/player20.png"
   }
 ]
