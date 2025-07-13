@@ -1,8 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuctionTimer from "./components/AuctionTimer";
 import BidInput from "./components/BidInput";
 import LoginPage from "./LoginPage";
+import PlayerCard from "./components/PlayerCard";
 
 const initialPoints = {
   팀장1: 3000,
@@ -17,6 +18,14 @@ function App() {
   const [lastBidTime, setLastBidTime] = useState(null);
   const [winner, setWinner] = useState("");
   const [points, setPoints] = useState(initialPoints);
+  const [players, setPlayers] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    fetch("/players.json")
+      .then(res => res.json())
+      .then(data => setPlayers(data));
+  }, []);
 
   const handleBidSubmit = (amount) => {
     if (amount > highestBid && user && points[user] >= amount) {
@@ -38,14 +47,18 @@ function App() {
     } else {
       alert("유찰되었습니다. 이 선수는 재경매로 넘어갑니다.");
     }
+
     setHighestBid(0);
     setWinner("");
     setLastBidTime(null);
+    setCurrentIndex((prev) => Math.min(prev + 1, players.length - 1));
   };
 
   if (!user) {
     return <LoginPage onLogin={setUser} />;
   }
+
+  const currentPlayer = players[currentIndex];
 
   return (
     <div style={{ padding: "20px" }}>
@@ -53,6 +66,7 @@ function App() {
         👤 로그인: {user} / 보유 포인트: {user.startsWith("팀장") ? points[user] : "관리자"}
       </div>
       <h1>롤 팀 구성 경매 프로그램</h1>
+      <PlayerCard player={currentPlayer} />
       <AuctionTimer duration={15} onTimeout={handleTimeout} lastBidTime={lastBidTime} />
       <h2>현재 최고 입찰가: {highestBid} 포인트</h2>
       {user !== "관리자" && <BidInput onBidSubmit={handleBidSubmit} />}
